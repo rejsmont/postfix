@@ -1,0 +1,95 @@
+Index: postfix-dev/src/xsasl/xsasl_cyrus_client.c
+===================================================================
+--- postfix-dev.orig/src/xsasl/xsasl_cyrus_client.c	2019-03-01 11:19:26.777713476 -0500
++++ postfix-dev/src/xsasl/xsasl_cyrus_client.c	2019-03-01 11:19:26.769713476 -0500
+@@ -229,6 +229,9 @@
+      */
+     static sasl_callback_t callbacks[] = {
+ 	{SASL_CB_LOG, (XSASL_CYRUS_CB) &xsasl_cyrus_log, 0},
++#ifdef SASL_CB_GETCONFPATH
++	{SASL_CB_GETCONFPATH,&xsasl_getconfpath, 0},
++#endif
+ 	{SASL_CB_LIST_END, 0, 0}
+     };
+ 
+Index: postfix-dev/src/xsasl/xsasl_cyrus_common.h
+===================================================================
+--- postfix-dev.orig/src/xsasl/xsasl_cyrus_common.h	2019-03-01 11:19:26.777713476 -0500
++++ postfix-dev/src/xsasl/xsasl_cyrus_common.h	2019-03-01 11:19:26.769713476 -0500
+@@ -16,12 +16,18 @@
+   */
+ #if defined(USE_SASL_AUTH) && defined(USE_CYRUS_SASL)
+ 
++#include <sasl.h>
++
+ #define NO_SASL_LANGLIST	((const char *) 0)
+ #define NO_SASL_OUTLANG		((const char **) 0)
+ #define xsasl_cyrus_strerror(status) \
+ 	sasl_errstring((status), NO_SASL_LANGLIST, NO_SASL_OUTLANG)
+ extern int xsasl_cyrus_log(void *, int, const char *);
+ extern int xsasl_cyrus_security_parse_opts(const char *);
++extern int xsasl_getpath(void * context, char ** path);
++#ifdef SASL_CB_GETCONFPATH
++extern int xsasl_getconfpath(void * context, char ** path);
++#endif
+ 
+ #endif
+ 
+Index: postfix-dev/src/xsasl/xsasl_cyrus_log.c
+===================================================================
+--- postfix-dev.orig/src/xsasl/xsasl_cyrus_log.c	2019-03-01 11:19:26.777713476 -0500
++++ postfix-dev/src/xsasl/xsasl_cyrus_log.c	2019-03-01 11:19:26.769713476 -0500
+@@ -28,10 +28,16 @@
+ /* System library. */
+ 
+ #include <sys_defs.h>
++#include <string.h>
+ 
+ /* Utility library. */
+ 
+ #include <msg.h>
++#include <stringops.h>
++
++/* Global library. */
++
++#include <mail_params.h>
+ 
+ /* Application-specific */
+ 
+@@ -101,4 +107,22 @@
+     return (SASL_OK);
+ }
+ 
++int xsasl_getpath(void * context, char ** path)
++{
++#if SASL_VERSION_MAJOR >= 2
++    *path = concatenate(var_config_dir, "/", "sasl:/usr/lib/sasl2", (char *) 0);
++#else
++    *path = concatenate(var_config_dir, "/", "sasl:/usr/lib/sasl", (char *) 0);
++#endif
++    return SASL_OK;
++}
++
++#ifdef SASL_CB_GETCONFPATH
++int xsasl_getconfpath(void * context, char ** path)
++{
++    *path = concatenate(var_config_dir, "/", "sasl:/usr/lib/sasl", (char *) 0);
++    return SASL_OK;
++}
++#endif
++
+ #endif
+Index: postfix-dev/src/xsasl/xsasl_cyrus_server.c
+===================================================================
+--- postfix-dev.orig/src/xsasl/xsasl_cyrus_server.c	2019-03-01 11:19:26.777713476 -0500
++++ postfix-dev/src/xsasl/xsasl_cyrus_server.c	2019-03-01 11:19:26.773713476 -0500
+@@ -181,6 +181,9 @@
+ 
+ static sasl_callback_t callbacks[] = {
+     {SASL_CB_LOG, (XSASL_CYRUS_CB) &xsasl_cyrus_log, NO_CALLBACK_CONTEXT},
++#ifdef SASL_CB_GETCONFPATH
++    {SASL_CB_GETCONFPATH,&xsasl_getconfpath, 0},
++#endif
+     {SASL_CB_LIST_END, 0, 0}
+ };
+ 

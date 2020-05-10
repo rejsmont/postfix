@@ -1,0 +1,28 @@
+Index: postfix-dev/src/tls/tls_client.c
+===================================================================
+--- postfix-dev.orig/src/tls/tls_client.c	2019-03-01 11:47:27.949749340 -0500
++++ postfix-dev/src/tls/tls_client.c	2019-03-01 11:47:27.945749340 -0500
+@@ -409,6 +409,9 @@
+     off |= tls_bug_bits();
+     SSL_CTX_set_options(client_ctx, off);
+ 
++    /* Enable all supported protocols */
++    SSL_CTX_set_min_proto_version(client_ctx, 0);
++
+     /*
+      * Set the call-back routine for verbose logging.
+      */
+Index: postfix-dev/src/tls/tls_server.c
+===================================================================
+--- postfix-dev.orig/src/tls/tls_server.c	2019-03-01 11:47:27.949749340 -0500
++++ postfix-dev/src/tls/tls_server.c	2019-03-01 11:47:27.945749340 -0500
+@@ -533,6 +533,9 @@
+     if (protomask != 0)
+ 	SSL_CTX_set_options(server_ctx, TLS_SSL_OP_PROTOMASK(protomask));
+ 
++    /* Enable all supported protocols */
++    SSL_CTX_set_min_proto_version(server_ctx, 0);
++
+     /*
+      * Some sites may want to give the client less rope. On the other hand,
+      * this could trigger inter-operability issues, the client should not

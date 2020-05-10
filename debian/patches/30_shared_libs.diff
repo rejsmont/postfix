@@ -1,0 +1,54 @@
+Index: postfix/src/dns/Makefile.in
+===================================================================
+--- postfix.orig/src/dns/Makefile.in
++++ postfix/src/dns/Makefile.in
+@@ -63,7 +63,7 @@ root_tests:
+ $(LIB):	$(OBJS)
+ 	$(AR) $(ARFL) $(LIB) $?
+ 	$(RANLIB) $(LIB)
+-	$(SHLIB_LD) $(SHLIB_RPATH) -o $(LIB) $(OBJS) $(SHLIB_SYSLIBS)
++	$(SHLIB_LD) $(SHLIB_RPATH) -o $(LIB) $(OBJS) $(SHLIB_SYSLIBS) -L../../lib -lpostfix-util -lpostfix-global
+ 
+ $(LIB_DIR)/$(LIB): $(LIB)
+ 	cp $(LIB) $(LIB_DIR)
+Index: postfix/src/global/Makefile.in
+===================================================================
+--- postfix.orig/src/global/Makefile.in
++++ postfix/src/global/Makefile.in
+@@ -144,7 +144,7 @@ test:	$(TESTPROG)
+ $(LIB):	$(OBJS)
+ 	$(AR) $(ARFL) $(LIB) $?
+ 	$(RANLIB) $(LIB)
+-	$(SHLIB_LD) $(SHLIB_RPATH) -o $(LIB) $(OBJS) $(SHLIB_SYSLIBS)
++	$(SHLIB_LD) $(SHLIB_RPATH) -o $(LIB) $(OBJS) $(SHLIB_SYSLIBS) -L../../lib -lpostfix-util
+ 
+ $(LIB_DIR)/$(LIB): $(LIB)
+ 	cp $(LIB) $(LIB_DIR)
+Index: postfix/src/master/Makefile.in
+===================================================================
+--- postfix.orig/src/master/Makefile.in
++++ postfix/src/master/Makefile.in
+@@ -44,7 +44,8 @@ root_tests:
+ $(LIB):	$(LIB_OBJ)
+ 	$(AR) $(ARFL) $(LIB) $?
+ 	$(RANLIB) $(LIB)
+-	$(SHLIB_LD) $(SHLIB_RPATH) -o $(LIB) $(LIB_OBJ) $(SHLIB_SYSLIBS)
++	$(SHLIB_LD) $(SHLIB_RPATH) -o $(LIB) $(LIB_OBJ) $(SHLIB_SYSLIBS) \
++		-L../../lib -lpostfix-global -lpostfix-util
+ 
+ $(LIB_DIR)/$(LIB): $(LIB)
+ 	cp $(LIB) $(LIB_DIR)/$(LIB)
+Index: postfix/src/tls/Makefile.in
+===================================================================
+--- postfix.orig/src/tls/Makefile.in
++++ postfix/src/tls/Makefile.in
+@@ -81,7 +81,8 @@ root_tests:
+ $(LIB):	$(OBJS)
+ 	$(AR) $(ARFL) $(LIB) $?
+ 	$(RANLIB) $(LIB)
+-	$(SHLIB_LD) $(SHLIB_RPATH) -o $(LIB) $(OBJS) $(SHLIB_SYSLIBS)
++	$(SHLIB_LD) $(SHLIB_RPATH) -o $(LIB) $(OBJS) $(SHLIB_SYSLIBS) \
++		-L../../lib -lpostfix-dns -lpostfix-global -lpostfix-util
+ 
+ $(LIB_DIR)/$(LIB): $(LIB)
+ 	cp $(LIB) $(LIB_DIR)

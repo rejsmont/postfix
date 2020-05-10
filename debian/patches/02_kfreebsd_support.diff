@@ -1,0 +1,15 @@
+Index: postfix-dev/makedefs
+===================================================================
+--- postfix-dev.orig/makedefs	2019-03-01 11:06:34.581697003 -0500
++++ postfix-dev/makedefs	2019-03-01 11:06:34.577697003 -0500
+@@ -595,8 +595,8 @@
+ 		: ${SHLIB_ENV="LD_LIBRARY_PATH=`pwd`/lib"}
+ 		: ${PLUGIN_LD="${CC-gcc} -shared"}
+ 		;;
+-     GNU.0*|GNU/kFreeBSD.[567]*)
+-		SYSTYPE=GNU0
++     GNU.0*|GNU/kFreeBSD.*)
++     		SYSTYPE=GNU0
+ 		case "$CCARGS" in
+ 		 *-DNO_DB*) ;;
+ 		 *) if [ -f /usr/include/db.h ]

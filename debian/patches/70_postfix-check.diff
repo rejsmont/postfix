@@ -1,0 +1,20 @@
+Index: postfix-dev/conf/postfix-script
+===================================================================
+--- postfix-dev.orig/conf/postfix-script	2019-03-01 11:47:22.941749233 -0500
++++ postfix-dev/conf/postfix-script	2019-03-01 11:47:22.937749233 -0500
+@@ -341,9 +341,14 @@
+ 	find $todo ! -user root \
+ 	    -exec $WARN not owned by root: {} \;
+ 
+-	find $todo \( -perm -020 -o -perm -002 \) \
++	# Handle symlinks separately
++	find -L $todo \( -perm -020 -o -perm -002 \) \
+ 	    -exec $WARN group or other writable: {} \;
+ 
++	find $todo -type l | while read f; do \
++	    readlink "$f" | grep -q / && $WARN symlink leaves directory: "$f"; \
++	done; \
++
+ 	# Check Postfix mail_owner-owned directory tree owner/permissions.
+ 
+ 	find $data_directory/. ! -user $mail_owner \

@@ -1,0 +1,2 @@
+# moved to sharedir to not bother users with conffile prompts
+rm_conffile /etc/postfix/makedefs.out 3.3.2-4~ postfix

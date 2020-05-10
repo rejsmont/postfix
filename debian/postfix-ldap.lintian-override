@@ -1,0 +1,2 @@
+postfix-ldap: postinst-has-useless-call-to-ldconfig
+postfix-ldap: postrm-has-useless-call-to-ldconfig

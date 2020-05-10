@@ -1,0 +1,9 @@
+In Debian, Postfix's smtp(8) uses a different name to avoid naming conflicts.
+Need to point lmtp(8) to the right file.  See #920356.
+Index: postfix-dev/man/man8/lmtp.8
+===================================================================
+--- postfix-dev.orig/man/man8/lmtp.8	2015-01-29 17:21:00.000000000 -0500
++++ postfix-dev/man/man8/lmtp.8	2019-02-16 02:46:57.254292885 -0500
+@@ -1 +1 @@
+-.so man8/smtp.8
++.so man8/smtp.8postfix

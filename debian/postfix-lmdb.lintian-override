@@ -1,0 +1,2 @@
+postfix-lmdb: postinst-has-useless-call-to-ldconfig
+postfix-lmdb: postrm-has-useless-call-to-ldconfig

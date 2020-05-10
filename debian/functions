@@ -1,0 +1,61 @@
+DISTRO=$(lsb_release -is 2>/dev/null || echo Debian)
+addmap()
+{
+    name=$1
+    if [ "x$2" != "x" ]; then
+	mkmap=${2:=}
+    fi
+    FILE=/etc/postfix/dynamicmaps.cf
+    if ! grep -q "^${name}[[:space:]]" ${FILE}; then
+	 echo "Adding ${name} map entry to ${FILE}"
+	 echo "${name}	postfix-${name}.so	dict_${name}_open	${mkmap}" >> ${FILE}
+    fi
+    return 0
+}
+delmap()
+{
+    name=$1
+    FILE=/etc/postfix/dynamicmaps.cf
+    if grep -q "^${name}[[:space:]]" ${FILE}; then
+	 echo "Removing ${name} map entry from ${FILE}"
+	 sed "/^${name}[[:space:]]/d" ${FILE} > ${FILE}.$$ && \
+	     cp ${FILE}.$$ ${FILE} && \
+	     rm ${FILE}.$$
+    fi
+    return 0
+}
+pathfind() {
+  OLDIFS="$IFS"
+  IFS=:
+  for p in $PATH; do
+    if [ -x "$p/$*" ]; then
+      IFS="$OLDIFS"
+      return 0
+    fi
+  done
+  IFS="$OLDIFS"
+  return 1
+}
+runnewaliases() {
+    db_get postfix/main_mailer_type && mailer="$RET"
+    if [ "$mailer" != "No configuration" ] || [ -f /etc/postfix/main.cf ]; then
+        db_fget postfix/newaliases run || true
+        if ( $RET ); then
+            echo "Running newaliases"
+            rm -f /etc/aliases.db   # handle the roll to db2.0
+            # newaliases chokes if hostname not set
+            # newaliases is equivalent to postalias $(postconf -hx alias_database)
+            # and in debootstrap, newaliases == /bin/true...
+            if [ -z "$(postconf -hx myhostname||true)" ]; then
+                cp -a main.cf main.cf.dpkg.$$
+                postconf -e 'myhostname=debian'
+                newaliases
+                db_fset postfix/newaliases run false
+                mv main.cf.dpkg.$$ main.cf
+            else
+                newaliases
+                db_fset postfix/newaliases run false
+            fi
+        fi
+    fi
+}

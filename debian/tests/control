@@ -1,0 +1,3 @@
+Tests: postfix
+Depends: procmail, sasl2-bin, python3-pexpect, lsb-release, python3, libsasl2-modules
+Restrictions: needs-root

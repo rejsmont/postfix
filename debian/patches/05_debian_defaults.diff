@@ -1,0 +1,118 @@
+Index: postfix/conf/main.cf
+===================================================================
+--- postfix.orig/conf/main.cf
++++ postfix/conf/main.cf
+@@ -75,7 +75,7 @@ data_directory = /var/lib/postfix
+ # particular, don't specify nobody or daemon. PLEASE USE A DEDICATED
+ # USER.
+ #
+-mail_owner = postfix
++#mail_owner = postfix
+ 
+ # The default_privs parameter specifies the default rights used by
+ # the local delivery agent for delivery to external file or command.
+@@ -114,6 +114,11 @@ mail_owner = postfix
+ # myorigin also specifies the default domain name that is appended
+ # to recipient addresses that have no @domain part.
+ #
++# Debian GNU/Linux specific:  Specifying a file name will cause the
++# first line of that file to be used as the name.  The Debian default
++# is /etc/mailname.
++#
++#myorigin = /etc/mailname
+ #myorigin = $myhostname
+ #myorigin = $mydomain
+ 
+@@ -279,6 +284,7 @@ unknown_local_recipient_reject_code = 55
+ #mynetworks = 168.100.189.0/28, 127.0.0.0/8
+ #mynetworks = $config_directory/mynetworks
+ #mynetworks = hash:/etc/postfix/network_table
++mynetworks = 127.0.0.0/8
+ 
+ # The relay_domains parameter restricts what destinations this system will
+ # relay mail to.  See the smtpd_recipient_restrictions description in
+@@ -567,6 +573,8 @@ unknown_local_recipient_reject_code = 55
+ #
+ #smtpd_banner = $myhostname ESMTP $mail_name
+ #smtpd_banner = $myhostname ESMTP $mail_name ($mail_version)
++smtpd_banner = $myhostname ESMTP $mail_name (@@DISTRO@@)
++
+ 
+ # PARALLEL DELIVERY TO THE SAME DESTINATION
+ #
+@@ -591,7 +599,7 @@ unknown_local_recipient_reject_code = 55
+ # logging level when an SMTP client or server host name or address
+ # matches a pattern in the debug_peer_list parameter.
+ #
+-debug_peer_level = 2
++#debug_peer_level = 2
+ 
+ # The debug_peer_list parameter specifies an optional list of domain
+ # or network patterns, /file/name patterns or type:name tables. When
+Index: postfix/conf/main.cf.tls
+===================================================================
+--- /dev/null
++++ postfix/conf/main.cf.tls
+@@ -0,0 +1,11 @@
++
++# TLS parameters
++smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
++smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
++smtpd_tls_security_level=may
++
++smtp_tls_CApath=/etc/ssl/certs
++smtp_tls_security_level=may
++smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
++
++
+Index: postfix/conf/postfix-files
+===================================================================
+--- postfix.orig/conf/postfix-files
++++ postfix/conf/postfix-files
+@@ -143,27 +143,28 @@ $newaliases_path:l:$sendmail_path
+ $mailq_path:l:$sendmail_path
+ $config_directory/LICENSE:f:root:-:644:1
+ $config_directory/TLS_LICENSE:f:root:-:644:1
+-$config_directory/access:f:root:-:644:p1
+-$config_directory/aliases:f:root:-:644:p1
+-$config_directory/bounce.cf.default:f:root:-:644:1
+-$config_directory/canonical:f:root:-:644:p1
+-$config_directory/cidr_table:f:root:-:644:o
+-$config_directory/generic:f:root:-:644:p1
+-$config_directory/generics:f:root:-:644:o
+-$config_directory/header_checks:f:root:-:644:p1
+-$config_directory/install.cf:f:root:-:644:o
+-$config_directory/main.cf.default:f:root:-:644:1
++# Empty files not shipped in Debian
++#$config_directory/access:f:root:-:644:p1
++#$config_directory/aliases:f:root:-:644:p1
++#$config_directory/bounce.cf.default:f:root:-:644:1
++#$config_directory/canonical:f:root:-:644:p1
++#$config_directory/cidr_table:f:root:-:644:o
++#$config_directory/generic:f:root:-:644:p1
++#$config_directory/generics:f:root:-:644:o
++#$config_directory/header_checks:f:root:-:644:p1
++#$config_directory/install.cf:f:root:-:644:o
++#$config_directory/main.cf.default:f:root:-:644:1
+ $config_directory/main.cf:f:root:-:644:p
+ $config_directory/master.cf:f:root:-:644:p
+-$config_directory/pcre_table:f:root:-:644:o
+-$config_directory/regexp_table:f:root:-:644:o
+-$config_directory/relocated:f:root:-:644:p1
+-$config_directory/tcp_table:f:root:-:644:o
+-$config_directory/transport:f:root:-:644:p1
+-$config_directory/virtual:f:root:-:644:p1
++#$config_directory/pcre_table:f:root:-:644:o
++#$config_directory/regexp_table:f:root:-:644:o
++#$config_directory/relocated:f:root:-:644:p1
++#$config_directory/tcp_table:f:root:-:644:o
++#$config_directory/transport:f:root:-:644:p1
++#$config_directory/virtual:f:root:-:644:p1
+ $config_directory/postfix-script:f:root:-:755:o
+-$config_directory/postfix-script-sgid:f:root:-:755:o
+-$config_directory/postfix-script-nosgid:f:root:-:755:o
++#$config_directory/postfix-script-sgid:f:root:-:755:o
++#$config_directory/postfix-script-nosgid:f:root:-:755:o
+ $config_directory/post-install:f:root:-:755:o
+ $manpage_directory/man1/mailq.1:f:root:-:644
+ $manpage_directory/man1/newaliases.1:f:root:-:644

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+WANTDIR="$1/postfix.service.wants"
+SERVICEFILE="/lib/systemd/system/postfix@.service"
+
+mkdir -p "$WANTDIR"
+
+ln -s "$SERVICEFILE" "$WANTDIR/postfix@-.service"
+for DIR in $(postconf -h multi_instance_directories); do
+    ln -s "$SERVICEFILE" "$WANTDIR/postfix@$(postconf -o inet_interfaces= -hc $DIR multi_instance_name).service"
+done
+
+exit 0

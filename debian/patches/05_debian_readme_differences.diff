@@ -1,0 +1,120 @@
+Index: postfix-dev/conf/postfix-files
+===================================================================
+--- postfix-dev.orig/conf/postfix-files	2019-03-01 11:19:12.133713164 -0500
++++ postfix-dev/conf/postfix-files	2019-03-01 11:19:12.129713164 -0500
+@@ -273,65 +273,65 @@
+ $sample_directory/sample-transport.cf:f:root:-:644:o
+ $sample_directory/sample-verify.cf:f:root:-:644:o
+ $sample_directory/sample-virtual.cf:f:root:-:644:o
+-$readme_directory/AAAREADME:f:root:-:644
+-$readme_directory/ADDRESS_CLASS_README:f:root:-:644
+-$readme_directory/ADDRESS_REWRITING_README:f:root:-:644
+-$readme_directory/ADDRESS_VERIFICATION_README:f:root:-:644
+-$readme_directory/BACKSCATTER_README:f:root:-:644
+-$readme_directory/BASIC_CONFIGURATION_README:f:root:-:644
+-$readme_directory/BUILTIN_FILTER_README:f:root:-:644
++$readme_directory/README.gz:f:root:-:644
++$readme_directory/ADDRESS_CLASS_README.gz:f:root:-:644
++$readme_directory/ADDRESS_REWRITING_README.gz:f:root:-:644
++$readme_directory/ADDRESS_VERIFICATION_README.gz:f:root:-:644
++$readme_directory/BACKSCATTER_README.gz:f:root:-:644
++$readme_directory/BASIC_CONFIGURATION_README.gz:f:root:-:644
++$readme_directory/BUILTIN_FILTER_README.gz:f:root:-:644
+ $readme_directory/CDB_README:f:root:-:644
+-$readme_directory/COMPATIBILITY_README:f:root:-:644
+-$readme_directory/CONNECTION_CACHE_README:f:root:-:644
++$readme_directory/COMPATIBILITY_README.gz:f:root:-:644
++$readme_directory/CONNECTION_CACHE_README.gz:f:root:-:644
+ $readme_directory/CONTENT_INSPECTION_README:f:root:-:644
+-$readme_directory/DATABASE_README:f:root:-:644
+-$readme_directory/DB_README:f:root:-:644
+-$readme_directory/DEBUG_README:f:root:-:644
+-$readme_directory/DSN_README:f:root:-:644
+-$readme_directory/ETRN_README:f:root:-:644
+-$readme_directory/FILTER_README:f:root:-:644
+-$readme_directory/FORWARD_SECRECY_README:f:root:-:644
+-$readme_directory/HOSTING_README:f:root:-:644:o
+-$readme_directory/INSTALL:f:root:-:644
+-$readme_directory/IPV6_README:f:root:-:644
+-$readme_directory/LDAP_README:f:root:-:644
++$readme_directory/DATABASE_README.gz:f:root:-:644
++$readme_directory/DB_README.gz:f:root:-:644
++$readme_directory/DEBUG_README.gz:f:root:-:644
++$readme_directory/DSN_README.gz:f:root:-:644
++$readme_directory/ETRN_README.gz:f:root:-:644
++$readme_directory/FILTER_README.gz:f:root:-:644
++$readme_directory/FORWARD_SECRECY_README.gz:f:root:-:644
++#$readme_directory/HOSTING_README:f:root:-:644:o
++#$readme_directory/INSTALL:f:root:-:644
++$readme_directory/IPV6_README.gz:f:root:-:644
++$readme_directory/LDAP_README.gz:f:root:-:644
+ $readme_directory/LINUX_README:f:root:-:644
+-$readme_directory/LMDB_README:f:root:-:644
+-$readme_directory/LOCAL_RECIPIENT_README:f:root:-:644
++$readme_directory/LMDB_README.gz:f:root:-:644
++$readme_directory/LOCAL_RECIPIENT_README.gz:f:root:-:644
+ $readme_directory/MACOSX_README:f:root:-:644:o
+-$readme_directory/MAILDROP_README:f:root:-:644
++$readme_directory/MAILDROP_README.gz:f:root:-:644
+ $readme_directory/MEMCACHE_README:f:root:-:644
+-$readme_directory/MILTER_README:f:root:-:644
+-$readme_directory/MULTI_INSTANCE_README:f:root:-:644
+-$readme_directory/MYSQL_README:f:root:-:644
++$readme_directory/MILTER_README.gz:f:root:-:644
++$readme_directory/MULTI_INSTANCE_README.gz:f:root:-:644
++$readme_directory/MYSQL_README.gz:f:root:-:644
+ $readme_directory/SQLITE_README:f:root:-:644
+-$readme_directory/NFS_README:f:root:-:644
+-$readme_directory/OVERVIEW:f:root:-:644
+-$readme_directory/PACKAGE_README:f:root:-:644
++$readme_directory/NFS_README.gz:f:root:-:644
++$readme_directory/OVERVIEW.gz:f:root:-:644
++$readme_directory/PACKAGE_README.gz:f:root:-:644
+ $readme_directory/PCRE_README:f:root:-:644
+-$readme_directory/PGSQL_README:f:root:-:644
+-$readme_directory/POSTSCREEN_README:f:root:-:644
++$readme_directory/PGSQL_README.gz:f:root:-:644
++$readme_directory/POSTSCREEN_README.gz:f:root:-:644
+ $readme_directory/QMQP_README:f:root:-:644:o
+-$readme_directory/QSHAPE_README:f:root:-:644
+-$readme_directory/RELEASE_NOTES:f:root:-:644
+-$readme_directory/RESTRICTION_CLASS_README:f:root:-:644
+-$readme_directory/SASL_README:f:root:-:644
+-$readme_directory/SCHEDULER_README:f:root:-:644
+-$readme_directory/SMTPD_ACCESS_README:f:root:-:644
+-$readme_directory/SMTPD_POLICY_README:f:root:-:644
+-$readme_directory/SMTPD_PROXY_README:f:root:-:644
+-$readme_directory/SOHO_README:f:root:-:644
+-$readme_directory/STANDARD_CONFIGURATION_README:f:root:-:644
+-$readme_directory/STRESS_README:f:root:-:644
+-$readme_directory/TLS_LEGACY_README:f:root:-:644
+-$readme_directory/TLS_README:f:root:-:644
+-$readme_directory/TUNING_README:f:root:-:644
++$readme_directory/QSHAPE_README.gz:f:root:-:644
++$readme_directory/RELEASE_NOTES.gz:f:root:-:644
++$readme_directory/RESTRICTION_CLASS_README.gz:f:root:-:644
++$readme_directory/SASL_README.gz:f:root:-:644
++$readme_directory/SCHEDULER_README.gz:f:root:-:644
++$readme_directory/SMTPD_ACCESS_README.gz:f:root:-:644
++$readme_directory/SMTPD_POLICY_README.gz:f:root:-:644
++$readme_directory/SMTPD_PROXY_README.gz:f:root:-:644
++$readme_directory/SOHO_README.gz:f:root:-:644
++$readme_directory/STANDARD_CONFIGURATION_README.gz:f:root:-:644
++$readme_directory/STRESS_README.gz:f:root:-:644
++$readme_directory/TLS_LEGACY_README.gz:f:root:-:644
++$readme_directory/TLS_README.gz:f:root:-:644
++$readme_directory/TUNING_README.gz:f:root:-:644
+ $readme_directory/ULTRIX_README:f:root:-:644
+-$readme_directory/UUCP_README:f:root:-:644
+-$readme_directory/VERP_README:f:root:-:644
+-$readme_directory/VIRTUAL_README:f:root:-:644
+-$readme_directory/XCLIENT_README:f:root:-:644
+-$readme_directory/XFORWARD_README:f:root:-:644
++$readme_directory/UUCP_README.gz:f:root:-:644
++$readme_directory/VERP_README.gz:f:root:-:644
++$readme_directory/VIRTUAL_README.gz:f:root:-:644
++$readme_directory/XCLIENT_README.gz:f:root:-:644
++$readme_directory/XFORWARD_README.gz:f:root:-:644
+ $html_directory/ADDRESS_CLASS_README.html:f:root:-:644
+ $html_directory/ADDRESS_REWRITING_README.html:f:root:-:644
+ $html_directory/ADDRESS_VERIFICATION_README.html:f:root:-:644

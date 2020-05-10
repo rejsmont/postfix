@@ -1,0 +1,252 @@
+In order to support multiple postfix instances, postfix uses multiple systemd
+unit files.  The overall postfix unit is for overall operations on all
+instances and individual unit files are available for each instance named
+postfix@${INSTANCE_NAME}.  The primary instance is named "-", so it can be
+directly addressed with systemctl using the name postfix@- (e.g.
+systemctl status postfix@-).  Wild cards work and so systemctl status postfix*
+will show the status of all active postfix units.
+
+In order to configure multiple postfix instances, follow the upstream
+directions (MULTI_INSTANCE_README) up to the point of starting the new
+instance.  Instead do the following (if running systemd - multi-instance with
+sysv init is untested by the maintainers in Debian 9, code name stretch):
+
+# systemctl daemon-reload
+# systemctl enable postfix@${INSTANCE_NAME}.service
+# systemctl start postfix@${INSTANCE_NAME}.service
+
+Once that is done, the new instance will be started and its status will show
+up with as part of systemctl status postfix*.
+
+
+There are some significant differences between the Debian Postfix packages,
+and the source from upstream:
+
+1.  The Debian install is chrooted by default.
+2.  Debian init system (systemd or sysv init) commands (e.g. systemctl or
+    service) should be used in lieu of direct calls to the postfix binary as
+    described in the upstream documentation is order to problem integrate with
+    Debian features such as using the system CA certificate bundle and proper
+    chroot configuration with system libraries and services.
+3.  For policy reasons:
+  a. SASL configuration goes in /etc/postfix/sasl
+  b. myhostname=/path/to/file is supported (and used) in main.cf
+4.  IPV6 support is enabled: postfix listens on ipv6/ipv4 by default,
+    (see: inet_protocols)
+5.  TLS/SASL support is enabled.
+6.  rmail comes from sendmail, not from postfix.
+7.  The upstream main.cf is delivered as /usr/share/postfix/main.cf.dist,
+    rather than cluttering /etc/postfix/main.cf with comments.
+
+Known caveats:
+1.  The dynamically loadable modules are not found in the chroot.
+    Therefore, proxy maps may require you to copy the appropriate shared
+    object into the chroot if you chroot the proxy service in master.cf.
+2.  Some map types (and SASL support) require some extra configuration
+    (beyond what upstream indicates) to run inside the chroot.  The simplest
+    solution for the maps is to use the proxy service, which is not chrooted.
+    SASL is a bit more complex, and is on the TODO list...
+3.  Note that the chrooted daemons open /dev/log before chrooting, so if your
+    syslog daemon is restarted, the daemons will be unable to reconnect to the
+    syslog socket, and hence being unable to log.  The postfix package provides
+    a config snipped for the rsyslog daemon in /etc/rsyslog.d/postfix.conf to
+    also open a socket in /var/log/postfix/dev.  For other syslog daemons, you
+    will also have to restart postfix after restarting the syslog daemon, or
+    configure it to open an additional socket.
+  a. For sysklogd (the default in Debian versions prior to Lenny), add
+     SYSLOG="-a /var/spool/postfix/dev/log" to /etc/default/syslog.
+  b. For inetutils-syslogd, add SYSLOGD_OPTS="-a /var/spool/postfix/dev/log" to
+     /etc/default/inetutils-syslogd.
+4.  Map types from the dynamically loadable modules are supported for the
+    alias database, but it is up to the system administrator to ensure the
+    required package is installed before changing the postfix configuration.
+    After changing the map type, newaliases must be run by hand.
+
+Upgrade notes:
+  milter_protocol:
+  Nearly all milter packages in the Debian archive use the
+  libmilter1.0.1 library which as of version 8.14 supports sendmail
+  milter protocol version 6. The postfix default, starting in version
+  2.6, is 'milter_protocol = 6'. If you are migrating a older postfix
+  configuration that specifies a lower version, it should be safe to
+  remove and depend on the default. If you are using milters not
+  provided by Debian, you may need to ensure compatibility.
+  For more information please see
+     http://www.postfix.org/MILTER_README.html
+
+
+Postfix Smarthost Configuration
+
+Postfix can be configured to relay mail to a 'smarthost' for delivery. In
+practice, with real world smarthosts, considerable configuration is required to
+make this work. Some of this configuration can be done via debconf
+('dpkg-reconfigure postfix'), but much of it will usually need to be done
+manually. This document provides instructions for such configuration.
+
+1. Set the smarthost
+
+This can be set via debconf. To do it manually, add a line like the following
+to /etc/postfix/main.cf:
+
+relayhost = [relayhost.example.com]:465
+
+If the port number is omitted, the default is 25. Most smarthosts use TLS/SSL,
+and accordingly generally use either 465 or 587 - see below.
+
+2. Enable TLS/SSL
+
+As above, most smarthosts use TLS/SSL. To configure Postfix to use TLS, add the
+following lines to main.cf:
+
+smtp_tls_security_level = verify
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+
+If 'encrypt' is used instead of 'verify', the second line may be omitted.
+'encrypt' means that TLS will be used but Postfix will not verify the
+smarthost's certificate, potentially allowing a man-in-the-middle attack and
+the stealing of the smarthost authentication credentials. On the other hand,
+'secure' may be used as an even stricter value than 'verify'. See the
+explanation of 'smtp_tls_security_level' values in postconf(5) for details.
+
+If SMTPS (sometimes called 'SSL', usually used in conjunction with
+port 465) is desired, add the following additional line to main.cf:
+
+smtp_tls_wrappermode = yes
+
+For STARTTLS (usually used in conjunction with port 587), omit this line (or
+use the value 'no').
+
+As to which port number / TLS type to use: consult your smarthost's
+documentation. If only one option is available, you will have to use that one.
+If both are available, the question is a toss-up. For the last couple of
+decades, STARTTLS on port 587 has been the offical, standards compliant method,
+although SMTPS on port 465 was also widely used. Recently, RFC 8314 has
+proposed the offical recognition of TLS on port 465.
+
+One potential weakness of STARTTLS is that as a form of opportunistic TLS, it
+is subject to a man-in-the-middle downgrade attack, where the server's
+advertisement of STARTTLS support is stripped out (STRIPTLS) by an attacker,
+causing the connection to continue without TLS:
+
+https://en.wikipedia.org/wiki/STARTTLS#Weaknesses_and_mitigations
+
+This can be avoided by making TLS mandatory, via the use of an appropriate
+value for 'smtp_tls_security_level' such as 'encrypt', 'verify', or 'secure'.
+
+3. Configure authentication
+
+Most smarthosts require authentication. To enable it, ensure that the package
+'libsasl2-modules' is installed, and add the following lines to main.cf:
+
+smtp_sasl_auth_enable = yes
+smtp_sasl_security_options =
+
+[See postconf(5) for more information about 'smtp_sasl_security_options' and
+its possible values. The above version, with no options, is generally fine.]
+
+To specify the authentication credentials, create an arbitrarily named file
+(e.g., '/etc/postfix/example-passwd'), with appropriately restrictive
+permissions (e.g., 600) containing a single line of the following form:
+
+relayhost.example.com username@example.com:secret_password
+
+Where 'relayhost.example.com' is the name of the smarthost,
+'username@example.com' is the login name, and 'secret_password' is the login
+password.
+
+After creating the file, run the command:
+
+postmap /etc/postfix/example.com-passwd
+
+and add the following line to main.cf:
+
+smtp_sasl_password_maps = hash:/etc/postfix/example-passwd
+
+4. Address rewriting
+
+Most smarthosts require that the sender (envelope FROM and perhaps also the
+email From: header) be set to the user's correct mail address with the
+smarthost. Postfix therefore needs to be configured to rewrite the sender
+address accordingly. There are multiple ways to do this, including canonical
+mapping and SMTP generic mapping.
+
+4a. Canonical mapping
+
+With sender canonical mapping, all sender addresses are rewritten upon
+Postfix's receipt of the mail. Create an arbitrarily named file (e.g.,
+'/etc/postfix/sender_canonical'), containing lines of the form
+
+local-user1	username@example.com
+local-user2	username@example.com
+
+where 'local-user1' and 'local-user2' are usernames on the system that will be
+sending mail via the smarthost
+
+After creating the file, run the command:
+
+postmap /etc/postfix/sender_canonical
+
+and add the following line to main.cf:
+
+sender_canonical_maps = hash:/etc/postfix/sender_canonical
+
+To use regular expressions to match multiple users, use either 'regexp' or
+'pcre' (requires the installation of 'postfix-pcre') tables. See
+DATABASE_README, regexp_table(5), PCRE_README, pcre_table(5), and postmap(1).
+
+4b. SMTP generic mapping
+
+With SMTP generic mapping, all matching addresses are rewritten upon Postfix's
+delivery of the mail via SMTP. Create an arbitrarily named file (e.g.,
+'/etc/postfix/generic_mapping'), containing a line of the form:
+
+@host.domain username@example.com
+
+with 'host.domain' taken from '/etc/mailname'.
+
+One advantage to using generic over canonical mapping is that the latter will
+be applied to local mail as well. If the system will be configured to send all
+mail, even mail addressed to local users, via the smarthost (e.g., via
+aliases), then this point is moot.
+
+Some mail services can be quite picky about what form of the email header From:
+they accept. It may be necessary to use an additional smtp_header_check rule to
+rewrite the header From: (whether created by the original sender, or by Postfix
+itself) into a form that the mail provider will accept. See:
+
+https://marc.info/?l=postfix-users&m=154662599103646
+https://marc.info/?l=postfix-users&m=154656149717210
+
+See the ADDRESS_REWRITING_README for more information.
+
+At this point, restart Postfix:
+
+/etc/init.d/postfix restart
+
+Test:
+
+echo 'test' | sendmail someuser@somehost.com
+
+5. Aliases
+
+As configured so far, local mail will be delivered locally and not sent via the
+smarthost. To redirect local mail through the smarthost, aliases can be used.
+In /etc/aliases, add lines like the following:
+
+root:	someuser@somehost.com
+
+Then run:
+
+newaliases
+
+6. CREDITS:
+
+This guide was based (with considerable elaboration) on a number of other
+guides on this topic (in addition to the official Postfix documentation),
+including:
+
+https://www.eanderalx.org/linux/postfix
+http://emanuelesantanche.com/article/85/configuring-postfix-to-relay-email-through-zoho-mail
+https://www.dnsexit.com/support/mailrelay/postfix.html
+https://www.cyberciti.biz/faq/postfix-smtp-authentication-for-mail-servers/
+https://blog.bravi.org/?p=1065

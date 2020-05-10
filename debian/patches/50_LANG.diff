@@ -1,0 +1,13 @@
+Index: postfix/html/Makefile.in
+===================================================================
+--- postfix.orig/html/Makefile.in	2016-02-16 13:57:02.847893144 -0700
++++ postfix/html/Makefile.in	2016-02-16 17:51:31.873418586 -0700
+@@ -25,7 +25,7 @@
+ 	postfix-wrapper.5.html sqlite_table.5.html socketmap_table.5.html
+ OTHER	= postfix-manuals.html
+ AWK	= awk '{ print; if (NR == 2) print ".pl 99999\n.ll 78" }'
+-MAN2HTML = man2html -t "Postfix manual - `IFS=.; set \`echo $@\`; echo \"$$1($$2)\"`"
++MAN2HTML = LANG=C man2html -t "Postfix manual - `IFS=.; set \`echo $@\`; echo \"$$1($$2)\"`"
+ NROFF	= LANG=C GROFF_NO_SGR=1 nroff
+ 
+ update:	$(DAEMONS) $(COMMANDS) $(CONFIG) $(OTHER)

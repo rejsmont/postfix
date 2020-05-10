@@ -1,0 +1,3 @@
+version=3
+
+opts=pasv,pgpsigurlmangle=s/$/.gpg2/ ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-([\d+\.]+)\.tar\.gz

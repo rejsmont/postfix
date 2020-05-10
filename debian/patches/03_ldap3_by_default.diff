@@ -1,0 +1,47 @@
+Index: postfix/src/global/dict_ldap.c
+===================================================================
+--- postfix.orig/src/global/dict_ldap.c	2018-02-23 02:37:11.468712118 -0500
++++ postfix/src/global/dict_ldap.c	2018-02-23 02:37:11.460712118 -0500
+@@ -102,7 +102,7 @@
+ /*	How to handle LDAP aliases. See ldap.h or ldap_open(3) man page.
+ /* .IP version
+ /*	Specifies the LDAP protocol version to use.  Default is version
+-/*	\fI2\fR.
++/*	\fI3\fR.
+ /* .IP "\fBsasl_mechs (empty)\fR"
+ /*	Specifies a space-separated list of LDAP SASL Mechanisms.
+ /* .IP "\fBsasl_realm (empty)\fR"
+@@ -1669,7 +1669,7 @@
+     /*
+      * Define LDAP Protocol Version.
+      */
+-    dict_ldap->version = cfg_get_int(dict_ldap->parser, "version", 2, 2, 0);
++    dict_ldap->version = cfg_get_int(dict_ldap->parser, "version", 3, 2, 0);
+     switch (dict_ldap->version) {
+     case 2:
+ 	dict_ldap->version = LDAP_VERSION2;
+@@ -1678,9 +1678,9 @@
+ 	dict_ldap->version = LDAP_VERSION3;
+ 	break;
+     default:
+-	msg_warn("%s: %s Unknown version %d, using 2.", myname, ldapsource,
++	msg_warn("%s: %s Unknown version %d, using 3.", myname, ldapsource,
+ 		 dict_ldap->version);
+-	dict_ldap->version = LDAP_VERSION2;
++	dict_ldap->version = LDAP_VERSION3;
+     }
+ 
+ #if defined(LDAP_API_FEATURE_X_OPENLDAP)
+Index: postfix/man/man5/ldap_table.5
+===================================================================
+--- postfix.orig/man/man5/ldap_table.5	2018-02-23 02:37:11.468712118 -0500
++++ postfix/man/man5/ldap_table.5	2018-02-23 02:37:11.464712118 -0500
+@@ -501,7 +501,7 @@
+ .IP "\fBchase_referrals (default: 0)\fR"
+ Sets (or clears) LDAP_OPT_REFERRALS (requires LDAP version
+ 3 support).
+-.IP "\fBversion (default: 2)\fR"
++.IP "\fBversion (default: 3)\fR"
+ Specifies the LDAP protocol version to use.
+ .IP "\fBdebuglevel (default: 0)\fR"
+ What level to set for debugging in the OpenLDAP libraries.

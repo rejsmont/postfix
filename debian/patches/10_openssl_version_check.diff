@@ -1,0 +1,32 @@
+Index: postfix/src/tls/tls_misc.c
+===================================================================
+--- postfix.orig/src/tls/tls_misc.c
++++ postfix/src/tls/tls_misc.c
+@@ -1219,26 +1219,7 @@ static void tls_version_split(unsigned l
+ 
+ void    tls_check_version(void)
+ {
+-    TLS_VINFO hdr_info;
+-    TLS_VINFO lib_info;
+-
+-    tls_version_split(OPENSSL_VERSION_NUMBER, &hdr_info);
+-    tls_version_split(OpenSSL_version_num(), &lib_info);
+-
+-    /*
+-     * Warn if run-time library is different from compile-time library,
+-     * allowing later run-time "micro" versions starting with 1.1.0.
+-     */
+-    if (lib_info.major != hdr_info.major
+-	|| lib_info.minor != hdr_info.minor
+-	|| (lib_info.micro != hdr_info.micro
+-	    && (lib_info.micro < hdr_info.micro
+-		|| hdr_info.major == 0
+-		|| (hdr_info.major == 1 && hdr_info.minor == 0))))
+-	msg_warn("run-time library vs. compile-time header version mismatch: "
+-	     "OpenSSL %d.%d.%d may not be compatible with OpenSSL %d.%d.%d",
+-		 lib_info.major, lib_info.minor, lib_info.micro,
+-		 hdr_info.major, hdr_info.minor, hdr_info.micro);
++	/* Debian will change the soname if openssl is ever incompatible. */
+ }
+ 
+ /* tls_compile_version - compile-time OpenSSL version */
